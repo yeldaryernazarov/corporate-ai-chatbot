@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  chatbot:
+    build: .
+    container_name: corporate-ai-chatbot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+    networks:
+      - chatbot-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  chatbot-network:
+    driver: bridge
+
+# Опционально: Redis для кэширования
+# Раскомментируйте если нужен кэш
+#  redis:
+#    image: redis:7-alpine
+#    container_name: chatbot-redis
+#    restart: unless-stopped
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - chatbot-network
+#    volumes:
+#      - redis-data:/data
+#
+#volumes:
+#  redis-data:
